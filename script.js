@@ -378,10 +378,14 @@ function getDefaultMask(){
     var point = {x: mc.point.x , y: mc.point.y}    
     points.push(point)
     // for ( var i = 0 ; i < p_c.length - 1 ; i ++) lines.push({ p1: p_c.length - 1 , p2: i })
-    for ( var i = 0 ; i < p_c.length - 1 ; i ++) point_lines.push({ p1: p_c.length - 1 , p2: i })
+    // for ( var i = 0 ; i < p_c.length - 1 ; i ++) point_lines.push({ p1: p_c.length - 1 , p2: i }) // lines: all circle points to mc.point
     
     // Rect points and lines
     var p_r = pointsOnRect()
+
+    // new points lines
+    for ( var i = 0, k = points.length ; i < p_c.length - 1 ; i += 2 , k ++ )  point_lines.push({p1: i , p2: k})
+
     // for ( var i = 0 ; i < p_r.length ; i ++ ) lines.push({ p1: i + points.length, p2: (i + 2) % p_r.length + points.length })
     for ( var i = 0 ; i < p_r.length ; i ++ ) rect_lines.push({ p1: i + points.length, p2: (i + 2) % p_r.length + points.length })
     points = points.concat(p_r)
