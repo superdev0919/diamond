@@ -7,6 +7,8 @@ var selected_point = -1 // current selected point in move point mode
 var sp = -1 , ep = -1 // start point and end point in connect point mode
 var isDraggingCircle = false , isScaleCircle = false, isScaleRect = false, isBendCircle = false, m_sp = {x: 0 , y: 0}
 
+var isPivotMade = false
+
 var pc = {
     // canvas setting
     global_alpha: 0.6,
@@ -542,7 +544,9 @@ $(document).ready(()=>{
         calculate()
     })
     $("#make_pivot").on('click' , () => {
-        makePivot()
+        if (!isPivotMade)
+            makePivot()
+        isPivotMade = true
     })
 
     $("#rotate_ccw").on('click' , () => {
