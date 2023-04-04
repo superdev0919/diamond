@@ -37,12 +37,12 @@ var mc = {
     move_point: {x: 0 , y: 0} // ep in bend circle
 }
 
-// function resetPanel(){
-//     points = []
-//     lines = []
-//     cu_panel_mode = 1
-//     selected_point = -1
-// }
+function resetPanel(){
+    points = []
+    lines = []
+    cu_panel_mode = 1
+    selected_point = -1
+}
 
 function redrawPanel(){
     panel.clearRect(0 , 0 , 10000 , 10000)
@@ -547,6 +547,9 @@ $(document).ready(()=>{
         if (!isPivotMade)
             makePivot()
         isPivotMade = true
+    })
+    $("#reset_panel").on("click" , () => {
+        window.location.reload()
     })
 
     $("#rotate_ccw").on('click' , () => {
