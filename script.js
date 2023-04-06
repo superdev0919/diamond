@@ -46,6 +46,7 @@ function resetPanel(){
 
 function redrawPanel(){
     panel.clearRect(0 , 0 , 10000 , 10000)
+    panel.scale(mc.bendrate.x , mc.bendrate.y)
     
     for (var i = 0 ; i < points.length ; i ++) point(points[i].x , points[i].y)
     // for (var i = 0 ; i < lines.length ; i ++) i > lines.length - 17 ? greenline(lines[i].p1 , lines[i].p2) : line(lines[i].p1 , lines[i].p2)
@@ -54,10 +55,10 @@ function redrawPanel(){
     for (var i = 0 ; i < rect_lines.length ; i ++) line(rect_lines[i].p1 , rect_lines[i].p2)
     for (var i = 0 ; i < green_lines.length ; i ++) greenline(green_lines[i].p1 , green_lines[i].p2)
     
-    panel.scale(mc.bendrate.x , mc.bendrate.y)
     drawCircle(mc.point.x , mc.point.y)
-    panel.scale(1 , 1)
-    
+    panel.setTransform(1, 0, 0, 1, 0, 0);
+
+    calculate()
 }
 
 function line(p1 , p2){
@@ -113,20 +114,59 @@ function getRadius(){
 }
 
 function calculate(){
-    for (var i = 0 ; i < 16 ; i ++){
-        var lst_lines = []
-        for (var k = lines.length - 16 ; k < lines.length ; k ++){
-                if (lines[k].p1 == i ) lst_lines.push({p1:lines[k].p1 , p2:lines[k].p2})
-                if (lines[k].p2 == i ) lst_lines.push({p1:lines[k].p2 , p2:lines[k].p1})
-        }
+    var html = ""
 
-        if( lst_lines.length >= 2 ){
-            for (var k = 1 ; k < lst_lines.length ; k ++){
-                drawAngleText(points[lst_lines[0].p2] , points[lst_lines[0].p1] , points[lst_lines[k].p2])
-            }
-        }
+    for (var i = 0 ; i < green_lines.length ; i ++){
+        var length = 
+            distanceToPoint(
+                {x: points[green_lines[i].p1].x * mc.bendrate.x , y: points[green_lines[i].p1].y * mc.bendrate.y},
+                {x: points[green_lines[i].p2].x * mc.bendrate.x , y: points[green_lines[i].p2].y * mc.bendrate.y})
+        html += `<tr>
+                    <th scope="row">${(i + 1)}</th>
+                    <td>${length}</td>
+                </tr>`
     }
+    $("#g_lines").empty() , $("#g_lines").append(html)
+
+    html = ""
+    for (var i = 0 ; i < point_lines.length ; i ++){
+        var length = 
+            distanceToPoint(
+                {x: points[point_lines[i].p1].x * mc.bendrate.x , y: points[point_lines[i].p1].y * mc.bendrate.y},
+                {x: points[point_lines[i].p2].x * mc.bendrate.x , y: points[point_lines[i].p2].y * mc.bendrate.y})
+        html += `<tr>
+                    <th scope="row">${(i + 1)}</th>
+                    <td>${length}</td>
+                </tr>`
+    }
+    $("#p_lines").empty() , $("#p_lines").append(html)
+
+    html = `<tr>
+                <th scope="row">x-axis rate</th>
+                <td>${mc.bendrate.x * 100}%</td>
+            </tr>
+            <tr>
+                <th scope="row">y-axis rate</th>
+                <td>${mc.bendrate.y * 100}%</td>
+            </tr>`
+    $("#bend_rate").empty() , $("#bend_rate").append(html)
 }
+
+// function calculate(){
+//     for (var i = 0 ; i < 16 ; i ++){
+//         var lst_lines = []
+//         for (var k = lines.length - 16 ; k < lines.length ; k ++){
+//                 if (lines[k].p1 == i ) lst_lines.push({p1:lines[k].p1 , p2:lines[k].p2})
+//                 if (lines[k].p2 == i ) lst_lines.push({p1:lines[k].p2 , p2:lines[k].p1})
+//         }
+
+//         if( lst_lines.length >= 2 ){
+//             for (var k = 1 ; k < lst_lines.length ; k ++){
+//                 drawAngleText(points[lst_lines[0].p2] , points[lst_lines[0].p1] , points[lst_lines[k].p2])
+//             }
+//         }
+//     }
+// }
 
 function getCrossOfSegments(l1 , l2){
     var c2x = points[l2.p1].x - points[l2.p2].x; // (x3 - x4)
@@ -186,8 +226,6 @@ function makePivot(){
         value.sort(sortCompare)
         for (var i = 0 ; i < value.length - 1 ; i ++) tmp_lines.push({p1:value[i] , p2:value[i + 1]})
     }
-
-    console.log(d_lines , tmp_lines)
     
     rect_lines = tmp_lines
 
@@ -240,12 +278,11 @@ function movePoint(x, y) {
     selected_point = findPointFromPos(x , y)
 }
 
-function moveCircleToPoint(x1 , y1 , x2 , y2){
-    mc.point.x += x2 - x1
-    mc.point.y += y2 - y1
+function moveCircleToPoint(x , y){
+    mc.point.x += x
+    mc.point.y += y
 
-    for (var i = 0 ; i < points.length ; i ++) points[i].x += (x2 - x1) , points[i].y += (y2 - y1)
-    redrawPanel()
+    for (var i = 0 ; i < points.length ; i ++) points[i].x += x , points[i].y += y
 }
 
 function moveCircle(x , y) {
@@ -291,6 +328,13 @@ function scaleRect(x , y) {
 }
 
 function bendCircle(x, y) {
+
+    console.log([x , mc.point.x])
+
+    if (m_sp.x == 0 || m_sp.y == 0){
+        m_sp = {x: x , y: y}
+        return 
+    }
     var radi = distanceToPoint(points[0] , mc.point)
     var bendrate = {
         x: (radi - (mc.point.x < m_sp.x ? (m_sp.x - x) / 10 : (x - m_sp.x) / 10)) / radi, 
@@ -300,41 +344,42 @@ function bendCircle(x, y) {
     // for(var i = 0 ; i < points.length ; i ++){
     //     points[i] = {x: points[i].x * (bendrate.x) , y: points[i].y * (bendrate.y)}
     // }
-    mc.bendrate.x =  bendrate.x
-    mc.bendrate.y =  bendrate.y
-    // console.log(points)
-
+    
     // mc.point.x /= bendrate.x
     // mc.point.y /= bendrate.y
-    var move_x = 0 , move_y = 0
+
+    // moveCircleToPoint(-mc.move_point.x , -mc.move_point.y)
+    var move_x = 0 , move_y = 0 , l_x , l_y
     if (x < mc.point.x){
         // right top position of the circle
-        var r_tp = mc.point.x + getRadius() 
-        move_x = r_tp - r_tp * mc.bendrate.x
+        l_x = mc.point.x + getRadius() 
         
     } else {
-        var l_tp = mc.point.x - getRadius()
-        move_x = l_tp - l_tp * mc.bendrate.x
+        l_x = mc.point.x - getRadius()
     }
-
-    if (y < mc.point.y){
-        var t_p = mc.point.y + getRadius()
-        move_y = t_p - t_p * mc.bendrate.y
-    } else {
-        var b_p = mc.point.y - getRadius()
-        move_y = b_p - b_p * mc.bendrate.y
-    }
-    mc.move_point.x  += move_x , mc.move_point.y += move_y
+    move_x = l_x / bendrate.x - l_x
     
-    moveCircleToPoint(0 , 0 , move_x , move_y)
+    if (y < mc.point.y){
+        l_y = mc.point.y + getRadius()
+    } else {
+        l_y = mc.point.y - getRadius()
+    }
+    move_y = l_y / bendrate.y - l_y
+
+    mc.move_point.x  = move_x , mc.move_point.y = move_y
+    
+    mc.bendrate.x *=  bendrate.x
+    mc.bendrate.y *=  bendrate.y
+
+    moveCircleToPoint(move_x , move_y)
     // moveCircleToPoint(0 , 0 , mc.point.x - mc.point.x * mc.bendrate.x , mc.point.y - mc.point.y * mc.bendrate.y)
-    // redrawPanel()
+    redrawPanel()
 }
 
 function getCursorPosition(canvas, event) {
     const rect = canvas.getBoundingClientRect()
-    const x = (event.clientX - rect.left) * mc.bendrate.x - mc.move_point.x
-    const y = (event.clientY - rect.top) * mc.bendrate.y - mc.move_point.y
+    const x = (event.clientX - rect.left) / mc.bendrate.x
+    const y = (event.clientY - rect.top) / mc.bendrate.y
     return {x: x , y: y}
 }
 
@@ -459,6 +504,7 @@ $(document).ready(()=>{
     })
 
     $("#panel").on("mousedown" , (e) => {
+        m_sp.x = m_sp.y = 0
         var pos = getCursorPosition(e.target, e)
         panel.globalAlpha = pc.global_alpha;
         switch(cu_panel_mode){
