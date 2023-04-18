@@ -615,8 +615,6 @@ $(document).ready(()=>{
 
 });
 
-
-
 // function drawLine(p1 , p2) {
 //     lines.push({p1: p1, p2:p2})
 //     line(p1, p2)
