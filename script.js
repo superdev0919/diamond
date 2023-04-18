@@ -471,6 +471,12 @@ $(document).ready(()=>{
     $("#panel").prop('height' , mc.x)
     drawDefaultMask()
 
+    for (var i = 0 ; i < points.length ; i ++){
+        var angle = 0.0001
+        points[i] = rotate(mc.point.x , mc.point.y , points[i].x , points[i].y , angle / 360 * Math.PI * 2)
+    }
+    redrawPanel()
+
     var img_size; // uploaded img width
     
     var _URL = window.URL || window.webkitURL;
