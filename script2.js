@@ -101,25 +101,30 @@ function point(x, y) {
 function calculate() {
     var html = ""
 
+    var total_width = distanceToPoint(points[2], points[6])
     html += `<tr>
-                <th scope="row">Table Width(px)</th>
-                <td>${distanceToPoint(points[lines[0].p1], points[lines[0].p2])}</td>
+                <th scope="row">Total Width(px)</th>
+                <td>${total_width}</td>
             </tr>`
     html += `<tr>
-                <th scope="row">Total Depth(px)</th>
-                <td>${distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2])}</td>
+                <th scope="row">Table Width(% of Total Width)</th>
+                <td>${distanceToPoint(points[lines[0].p1], points[lines[0].p2]) / total_width * 100}</td>
             </tr>`
     html += `<tr>
-                <th scope="row">Crown Height(px)</th>
-                <td>${distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2])}</td>
+                <th scope="row">Total Depth(% of Total Width)</th>
+                <td>${distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2]) / total_width * 100}</td>
             </tr>`
     html += `<tr>
-                <th scope="row">Pavilion Depth(px)</th>
-                <td>${distanceToPoint(points[4], points[3], points[5])}</td>
+                <th scope="row">Crown Height(% of Total Width)</th>
+                <td>${distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) / total_width * 100}</td>
             </tr>`
     html += `<tr>
-                <th scope="row">Girdle(px)</th>
-                <td>${distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) - distanceToPoint(points[4], points[3], points[5])}</td>
+                <th scope="row">Pavilion Depth(% of Total Width)</th>
+                <td>${distToSegment(points[4], points[3], points[5]) / total_width * 100}</td>
+            </tr>`
+    html += `<tr>
+                <th scope="row">Girdle(% of Total Width)</th>
+                <td>${(distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[4], points[3], points[5])) / total_width * 100 }</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Crown Angle(Deg)</th>
@@ -180,8 +185,8 @@ function distToSegmentSquared(p, v, w) {
     
   var t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
     
-  if (t < 0) return dist2(p, v);
-  if (t > 1) return dist2(p, w);
+//   if (t < 0) return dist2(p, v);
+//   if (t > 1) return dist2(p, w);
     
   return dist2(p, { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) });
 }
