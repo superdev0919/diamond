@@ -123,7 +123,7 @@ function calculate(){
                 {x: points[green_lines[i].p2].x * mc.bendrate.x , y: points[green_lines[i].p2].y * mc.bendrate.y})
         html += `<tr>
                     <th scope="row">${(i + 1)}</th>
-                    <td>${length}</td>
+                    <td>${length.toFixed(2)}</td>
                 </tr>`
     }
     $("#g_lines").empty() , $("#g_lines").append(html)
@@ -136,18 +136,18 @@ function calculate(){
                 {x: points[point_lines[i].p2].x * mc.bendrate.x , y: points[point_lines[i].p2].y * mc.bendrate.y})
         html += `<tr>
                     <th scope="row">${(i + 1)}</th>
-                    <td>${length}</td>
+                    <td>${length.toFixed(2)}</td>
                 </tr>`
     }
     $("#p_lines").empty() , $("#p_lines").append(html)
 
     html = `<tr>
                 <th scope="row">x-axis rate</th>
-                <td>${mc.bendrate.x * 100}%</td>
+                <td>${mc.bendrate.x.toFixed(4) * 100}%</td>
             </tr>
             <tr>
                 <th scope="row">y-axis rate</th>
-                <td>${mc.bendrate.y * 100}%</td>
+                <td>${mc.bendrate.y.toFixed(4) * 100}%</td>
             </tr>`
     $("#bend_rate").empty() , $("#bend_rate").append(html)
 }

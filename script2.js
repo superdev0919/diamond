@@ -102,37 +102,45 @@ function calculate() {
     var html = ""
 
     var total_width = distanceToPoint(points[2], points[6])
+    var table_width = distanceToPoint(points[lines[0].p1], points[lines[0].p2]) / total_width * 100
+    var total_depth = distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2]) / total_width * 100
+    var crown_height = distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) / total_width * 100
+    var pavilion_depth = distToSegment(points[4], points[3], points[5]) / total_width * 100
+    var girdle = (distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[4], points[3], points[5])) / total_width * 100
+    var crown_angle = getAngle(points[1] , points[2] , points[3]) - 90
+    var pavilion_angle = getAngle(points[2] , points[3] , points[4]) - 90
+
     html += `<tr>
                 <th scope="row">Total Width(px)</th>
-                <td>${total_width}</td>
+                <td>${total_width.toFixed(2)}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Table Width(% of Total Width)</th>
-                <td>${distanceToPoint(points[lines[0].p1], points[lines[0].p2]) / total_width * 100}</td>
+                <td>${table_width.toFixed(2)}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Total Depth(% of Total Width)</th>
-                <td>${distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2]) / total_width * 100}</td>
+                <td>${total_depth.toFixed(2)}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Crown Height(% of Total Width)</th>
-                <td>${distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) / total_width * 100}</td>
+                <td>${crown_height.toFixed(2)}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Pavilion Depth(% of Total Width)</th>
-                <td>${distToSegment(points[4], points[3], points[5]) / total_width * 100}</td>
+                <td>${pavilion_depth.toFixed(2)}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Girdle(% of Total Width)</th>
-                <td>${(distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[4], points[3], points[5])) / total_width * 100 }</td>
+                <td>${girdle.toFixed(2)}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Crown Angle(Deg)</th>
-                <td>${getAngle(points[1] , points[2] , points[3]) - 90}</td>
+                <td>${crown_angle.toFixed(2)}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Pavilion Angle(Deg)</th>
-                <td>${getAngle(points[2] , points[3] , points[4]) - 90}</td>
+                <td>${pavilion_angle.toFixed(2)}</td>
             </tr>`
     $("#bend_rate").empty(), $("#bend_rate").append(html)
 }
