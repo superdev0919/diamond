@@ -143,7 +143,6 @@ function getAngle(pt1, pt2, pt3){
     
     var a = parseFloat((a2 - a1) * 180.0 / Math.PI + 360);
     a = a > 360 ? a - 360 : a
-    console.log(a)
     if (a > 180) return 360 - a
     return a
 }
