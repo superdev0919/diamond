@@ -1,4 +1,4 @@
-const vertices = [{ x: 102, y: 0 }, { x: 388, y: 0 }, { x: 500, y: 75 }, { x: 500, y: 101 }, { x: 250, y: 300 }, { x: 0, y: 101 }, { x: 0, y: 75 }]
+const vertices = [{ x: 102, y: 0 }, { x: 398, y: 0 }, { x: 500, y: 75 }, { x: 500, y: 102 }, { x: 250, y: 300 }, { x: 0, y: 102 }, { x: 0, y: 75 }]
 
 // Calculate the area of the polygon using the Shoelace Formula
 function calculatePolygonArea(vertices) {
@@ -107,8 +107,10 @@ function calculate() {
     var crown_height = distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) / total_width * 100
     var pavilion_depth = distToSegment(points[4], points[3], points[5]) / total_width * 100
     var girdle = (distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[4], points[3], points[5])) / total_width * 100
-    var crown_angle = getAngle(points[1] , points[2] , points[3]) - 90
-    var pavilion_angle = getAngle(points[2] , points[3] , points[4]) - 90
+    var crown_angle_r = getAngle(points[1] , points[2] , points[3]) - 90
+    var crown_angle_l = getAngle(points[5] , points[6] , points[0]) - 90
+    var pavilion_angle_r = getAngle(points[2] , points[3] , points[4]) - 90
+    var pavilion_angle_l = getAngle(points[4] , points[5] , points[6]) - 90
 
     html += `<tr>
                 <th scope="row">Total Width(px)</th>
@@ -135,12 +137,20 @@ function calculate() {
                 <td>${girdle.toFixed(2)}</td>
             </tr>`
     html += `<tr>
-                <th scope="row">Crown Angle(Deg)</th>
-                <td>${crown_angle.toFixed(2)}</td>
+                <th scope="row">Crown Angle Right(Deg)</th>
+                <td>${crown_angle_r.toFixed(2)}</td>
             </tr>`
     html += `<tr>
-                <th scope="row">Pavilion Angle(Deg)</th>
-                <td>${pavilion_angle.toFixed(2)}</td>
+                <th scope="row">Crown Angle Left(Deg)</th>
+                <td>${crown_angle_l.toFixed(2)}</td>
+            </tr>`
+    html += `<tr>
+                <th scope="row">Pavilion Angle Right(Deg)</th>
+                <td>${pavilion_angle_r.toFixed(2)}</td>
+            </tr>`
+    html += `<tr>
+                <th scope="row">Pavilion Angle Left(Deg)</th>
+                <td>${pavilion_angle_l.toFixed(2)}</td>
             </tr>`
     $("#bend_rate").empty(), $("#bend_rate").append(html)
 }
