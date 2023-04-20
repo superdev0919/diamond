@@ -154,45 +154,71 @@ function calculate() {
     var diamond_weight = diamond_volume * pc.density
 
 
+    var evalIndexed = getEvaluationIndex()
+    var eval_state_mapping = ["Fair" , "Good" ,"Very Good" , "Excellent" , "Very Good" , "Good" , "Fair"]
+    // return {
+    //     crown_angle_index: crown_angle_index,
+    //     pavilin_angle_index: pavilin_angle_index,
+    //     table_width_index: table_width_index,
+    //     crown_height_index: crown_height_index,
+    //     pavilion_depth_index: pavilion_depth_index,
+    //     girdle_index: girdle_index,
+    //     total_depth_index: total_depth_index,
+    //     sumalphabet_index: sumalphabet_index,
+            // crown_angle_r_index: crown_angle_r_index,
+            // crown_angle_l_index: crown_angle_l_index,
+
+            // pavilin_angle_r_index: pavilin_angle_r_index,
+            // pavilin_angle_l_index: pavilin_angle_l_index
+    // }
     html += `<tr>
                 <th scope="row">Total Width(mm)</th>
-                <td>${d.total_width_in_mm.toFixed(2)}</td>
+                <td>${d.total_width_in_mm.toFixed(2)}</td><td></td>
             </tr>`
     html += `<tr>
                 <th scope="row">Table Width(% of Total Width)</th>
                 <td>${d.table_width.toFixed(2)}</td>
+                <td>${eval_state_mapping[evalIndexed.table_width_index]}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Total Depth(% of Total Width)</th>
                 <td>${d.total_depth.toFixed(2)}</td>
+                <td>${eval_state_mapping[evalIndexed.total_depth_index]}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Crown Height(% of Total Width)</th>
                 <td>${d.crown_height.toFixed(2)}</td>
+                <td>${eval_state_mapping[evalIndexed.crown_height_index]}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Pavilion Depth(% of Total Width)</th>
                 <td>${d.pavilion_depth.toFixed(2)}</td>
+                <td>${eval_state_mapping[evalIndexed.pavilion_depth_index]}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Girdle(% of Total Width)</th>
                 <td>${d.girdle.toFixed(2)}</td>
+                <td>${eval_state_mapping[evalIndexed.girdle_index]}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Crown Angle Right(Deg)</th>
                 <td>${d.crown_angle_r.toFixed(2)}</td>
+                <td>${eval_state_mapping[evalIndexed.crown_angle_r_index]}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Crown Angle Left(Deg)</th>
                 <td>${d.crown_angle_l.toFixed(2)}</td>
+                <td>${eval_state_mapping[evalIndexed.crown_angle_l_index]}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Pavilion Angle Right(Deg)</th>
                 <td>${d.pavilion_angle_r.toFixed(2)}</td>
+                <td>${eval_state_mapping[evalIndexed.pavilin_angle_r_index]}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Pavilion Angle Left(Deg)</th>
                 <td>${d.pavilion_angle_l.toFixed(2)}</td>
+                <td>${eval_state_mapping[evalIndexed.pavilin_angle_l_index]}</td>
             </tr>`
     html += `<tr>
                 <th scope="row">Diamond Volume(mm&#xb3;)</th>
@@ -202,25 +228,6 @@ function calculate() {
                 <th scope="row">Diamond Weight(g)</th>
                 <td>${diamond_weight.toFixed(2)}</td>
             </tr>`
-
-    var evalIndexed = getEvaluationIndex()
-    var eval_mapping = {
-        crown_angle_index: "Crown Angle (\u03B2)",
-        pavilin_angle_index: "Pavilion Angle (\u2C6D)",
-        table_width_index: "Table Width",
-        crown_height_index: "Crown Height",
-        pavilion_depth_index: "Pavilion Depth",
-        girdle_index: "Girdle",
-        total_depth_index: "Total Depth",
-        sumalphabet_index: "Sum \u2C6D and \u03B2",
-    }
-    var eval_state_mapping = ["Fair" , "Good" ,"Very Good" , "Excellent" , "Very Good" , "Good" , "Fair"]
-    for (var keys = Object.keys(evalIndexed) , i = 0 ; i < keys.length ; i ++){
-        html += `<tr>
-                    <th scope="row">${eval_mapping[keys[i]]}</th>
-                    <td>${eval_state_mapping[evalIndexed[keys[i]]]}</td>
-                </tr>`
-    }
 
     $("#bend_rate").empty(), $("#bend_rate").append(html)
 }
@@ -369,6 +376,24 @@ function getEvaluationIndex(){
     else if ((d.crown_angle_r + d.crown_angle_l)/2 < 40.0) crown_angle_index = 5
     else crown_angle_index = 6
 
+    var crown_angle_r_index;
+    if (d.crown_angle_r < 25.9) crown_angle_r_index = 0
+    else if (d.crown_angle_r < 27.9) crown_angle_r_index = 1
+    else if (d.crown_angle_r < 31.2) crown_angle_r_index = 2
+    else if (d.crown_angle_r < 36.7) crown_angle_r_index = 3
+    else if (d.crown_angle_r < 38.2) crown_angle_r_index = 4
+    else if (d.crown_angle_r < 40.0) crown_angle_r_index = 5
+    else crown_angle_r_index = 6
+
+    var crown_angle_l_index;
+    if (d.crown_angle_l < 25.9) crown_angle_l_index = 0
+    else if (d.crown_angle_l < 27.9) crown_angle_l_index = 1
+    else if (d.crown_angle_l < 31.2) crown_angle_l_index = 2
+    else if (d.crown_angle_l < 36.7) crown_angle_l_index = 3
+    else if (d.crown_angle_l < 38.2) crown_angle_l_index = 4
+    else if (d.crown_angle_l < 40.0) crown_angle_l_index = 5
+    else crown_angle_l_index = 6
+
     var pavilin_angle_index;
     if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 38.4) pavilin_angle_index = 0
     else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 39.5) pavilin_angle_index = 1
@@ -377,6 +402,24 @@ function getEvaluationIndex(){
     else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 42.1) pavilin_angle_index = 4
     else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 43.1) pavilin_angle_index = 5
     else pavilin_angle_index = 6
+
+    var pavilin_angle_r_index;
+    if (d.pavilion_angle_r < 38.4) pavilin_angle_r_index = 0
+    else if (d.pavilion_angle_r < 39.5) pavilin_angle_r_index = 1
+    else if (d.pavilion_angle_r < 40.5) pavilin_angle_r_index = 2
+    else if (d.pavilion_angle_r < 41.8) pavilin_angle_r_index = 3
+    else if (d.pavilion_angle_r < 42.1) pavilin_angle_r_index = 4
+    else if (d.pavilion_angle_r < 43.1) pavilin_angle_r_index = 5
+    else pavilin_angle_r_index = 6
+
+    var pavilin_angle_l_index;
+    if (d.pavilion_angle_l < 38.4) pavilin_angle_l_index = 0
+    else if (d.pavilion_angle_l < 39.5) pavilin_angle_l_index = 1
+    else if (d.pavilion_angle_l < 40.5) pavilin_angle_l_index = 2
+    else if (d.pavilion_angle_l < 41.8) pavilin_angle_l_index = 3
+    else if (d.pavilion_angle_l < 42.1) pavilin_angle_l_index = 4
+    else if (d.pavilion_angle_l < 43.1) pavilin_angle_l_index = 5
+    else pavilin_angle_l_index = 6
 
     var table_width_index;
     if (d.table_width < 47) table_width_index = 0
@@ -450,6 +493,12 @@ function getEvaluationIndex(){
         girdle_index: girdle_index,
         total_depth_index: total_depth_index,
         sumalphabet_index: sumalphabet_index,
+
+        crown_angle_r_index: crown_angle_r_index,
+        crown_angle_l_index: crown_angle_l_index,
+
+        pavilin_angle_r_index: pavilin_angle_r_index,
+        pavilin_angle_l_index: pavilin_angle_l_index
     }
 }
 
