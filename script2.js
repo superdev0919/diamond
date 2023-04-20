@@ -553,13 +553,13 @@ $(document).ready(() => {
         $("#tbl_overview").empty(), $("#tbl_overview").append(html)
 
         var top_r = d.total_width_in_mm * d.table_width / 100 / 2
-        var girdle_r = d.total_width_in_mm
-        var top_h = d.total_width_in_mm * d.crown_height / 100 / 2
+        var girdle_r = d.total_width_in_mm / 2
+        var top_h = d.total_width_in_mm * d.crown_height / 100
         var volume_top = Math.PI * top_h / 3 * (top_r * top_r + girdle_r * girdle_r + top_r * girdle_r)
 
         var volume_girdle = Math.PI * girdle_r * girdle_r * d.girdle * d.total_width_in_mm / 100
 
-        var volume_bottom = Math.PI * girdle_r * girdle_r / 3
+        var volume_bottom = Math.PI * girdle_r * girdle_r * d.total_width_in_mm * d.pavilion_depth / 100 / 3
 
         var diamond_volume = volume_top + volume_girdle + volume_bottom
 
