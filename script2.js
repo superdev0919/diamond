@@ -216,7 +216,6 @@ function calculate() {
     }
     var eval_state_mapping = ["Fair" , "Good" ,"Very Good" , "Excellent" , "Very Good" , "Good" , "Fair"]
     for (var keys = Object.keys(evalIndexed) , i = 0 ; i < keys.length ; i ++){
-        console.log(keys[i])
         html += `<tr>
                     <th scope="row">${eval_mapping[keys[i]]}</th>
                     <td>${eval_state_mapping[evalIndexed[keys[i]]]}</td>
