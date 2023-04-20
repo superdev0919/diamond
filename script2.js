@@ -173,6 +173,14 @@ function calculate() {
             // pavilin_angle_l_index: pavilin_angle_l_index
     // }
     html += `<tr>
+                <th scope="row">Diamond Volume(mm&#xb3;)</th>
+                <td>${diamond_volume.toFixed(2)}</td>
+            </tr>`
+    html += `<tr>
+                <th scope="row">Diamond Weight(ct)</th>
+                <td>${diamond_weight_carat.toFixed(2)}</td>
+            </tr>`
+    html += `<tr>
                 <th scope="row">Total Width(mm)</th>
                 <td>${d.total_width_in_mm.toFixed(2)}</td><td></td>
             </tr>`
@@ -221,14 +229,7 @@ function calculate() {
                 <td>${d.pavilion_angle_l.toFixed(2)}</td>
                 <td>${eval_state_mapping[evalIndexed.pavilin_angle_l_index]}</td>
             </tr>`
-    html += `<tr>
-                <th scope="row">Diamond Volume(mm&#xb3;)</th>
-                <td>${diamond_volume.toFixed(2)}</td>
-            </tr>`
-    html += `<tr>
-                <th scope="row">Diamond Weight(ct)</th>
-                <td>${diamond_weight_carat.toFixed(2)}</td>
-            </tr>`
+
 
     $("#bend_rate").empty(), $("#bend_rate").append(html)
 }
