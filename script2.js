@@ -140,19 +140,19 @@ function calculate() {
     var d = getParameters()
     var html = ""
 
-    // var unit_line = distanceToPoint(points[7] , points[8]) / pc.unit_length
+    var top_r = d.total_width_in_mm * d.table_width / 100 / 2
+    var girdle_r = d.total_width_in_mm / 2
+    var top_h = d.total_width_in_mm * d.crown_height / 100
+    var volume_top = Math.PI * top_h / 3 * (top_r * top_r + girdle_r * girdle_r + top_r * girdle_r)
 
-    // var total_width = distanceToPoint(points[2], points[6])
-    // var total_width_in_mm = total_width * unit_line
-    // var table_width = distanceToPoint(points[lines[0].p1], points[lines[0].p2]) / total_width * 100
-    // var total_depth = distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2]) / total_width * 100
-    // var crown_height = distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) / total_width * 100
-    // var pavilion_depth = distToSegment(points[4], points[3], points[5]) / total_width * 100
-    // var girdle = (distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[4], points[3], points[5])) / total_width * 100
-    // var crown_angle_r = getAngle(points[1] , points[2] , points[3]) - 90
-    // var crown_angle_l = getAngle(points[5] , points[6] , points[0]) - 90
-    // var pavilion_angle_r = getAngle(points[2] , points[3] , points[4]) - 90
-    // var pavilion_angle_l = getAngle(points[4] , points[5] , points[6]) - 90
+    var volume_girdle = Math.PI * girdle_r * girdle_r * d.girdle * d.total_width_in_mm / 100
+
+    var volume_bottom = Math.PI * girdle_r * girdle_r * d.total_width_in_mm * d.pavilion_depth / 100 / 3
+
+    var diamond_volume = volume_top + volume_girdle + volume_bottom
+
+    var diamond_weight = diamond_volume * pc.density
+
 
     html += `<tr>
                 <th scope="row">Total Width(mm)</th>
@@ -194,6 +194,35 @@ function calculate() {
                 <th scope="row">Pavilion Angle Left(Deg)</th>
                 <td>${d.pavilion_angle_l.toFixed(2)}</td>
             </tr>`
+    html += `<tr>
+                <th scope="row">Diamond Volume(mm&#xb3;)</th>
+                <td>${diamond_volume.toFixed(2)}</td>
+            </tr>`
+    html += `<tr>
+                <th scope="row">Diamond Weight(g)</th>
+                <td>${diamond_weight.toFixed(2)}</td>
+            </tr>`
+
+    var evalIndexed = getEvaluationIndex()
+    var eval_mapping = {
+        crown_angle_index: "Crown Angle (\u03B2)",
+        pavilin_angle_index: "Pavilion Angle (\u2C6D)",
+        table_width_index: "Table Width",
+        crown_height_index: "Crown Height",
+        pavilion_depth_index: "Pavilion Depth",
+        girdle_index: "Girdle",
+        total_depth_index: "Total Depth",
+        sumalphabet_index: "Sum \u2C6D and \u03B2",
+    }
+    var eval_state_mapping = ["Fair" , "Good" ,"Very Good" , "Excellent" , "Very Good" , "Good" , "Fair"]
+    for (var keys = Object.keys(evalIndexed) , i = 0 ; i < keys.length ; i ++){
+        console.log(keys[i])
+        html += `<tr>
+                    <th scope="row">${eval_mapping[keys[i]]}</th>
+                    <td>${eval_state_mapping[evalIndexed[keys[i]]]}</td>
+                </tr>`
+    }
+
     $("#bend_rate").empty(), $("#bend_rate").append(html)
 }
 
@@ -330,6 +359,125 @@ function getOverviewHtml(id){
     return html
 }
 
+function getEvaluationIndex(){
+    var d = getParameters()
+    var crown_angle_index;
+    if ((d.crown_angle_r + d.crown_angle_l)/2 < 25.9) crown_angle_index = 0
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 < 27.9) crown_angle_index = 1
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 < 31.2) crown_angle_index = 2
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 < 36.7) crown_angle_index = 3
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 < 38.2) crown_angle_index = 4
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 < 40.0) crown_angle_index = 5
+    else crown_angle_index = 6
+
+    var pavilin_angle_index;
+    if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 38.4) pavilin_angle_index = 0
+    else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 39.5) pavilin_angle_index = 1
+    else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 40.5) pavilin_angle_index = 2
+    else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 41.8) pavilin_angle_index = 3
+    else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 42.1) pavilin_angle_index = 4
+    else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 43.1) pavilin_angle_index = 5
+    else pavilin_angle_index = 6
+
+    var table_width_index;
+    if (d.table_width < 47) table_width_index = 0
+    else if (d.table_width < 49) table_width_index = 1
+    else if (d.table_width < 51) table_width_index = 2
+    else if (d.table_width < 62) table_width_index = 3
+    else if (d.table_width < 66) table_width_index = 4
+    else if (d.table_width < 70) table_width_index = 5
+    else table_width_index = 6
+
+    var crown_height_index;
+    if (d.crown_height < 8.5) crown_height_index = 0
+    else if (d.crown_height < 10.5) crown_height_index = 1
+    else if (d.crown_height < 11.5) crown_height_index = 2
+    else if (d.crown_height < 17.0) crown_height_index = 3
+    else if (d.crown_height < 18.0) crown_height_index = 4
+    else if (d.crown_height < 19.5) crown_height_index = 5
+    else crown_height_index = 6
+
+    var pavilion_depth_index;
+    if (d.pavilion_depth < 39.5) pavilion_depth_index = 0
+    else if (d.pavilion_depth < 41.0) pavilion_depth_index = 1
+    else if (d.pavilion_depth < 42.5) pavilion_depth_index = 2
+    else if (d.pavilion_depth < 44.5) pavilion_depth_index = 3
+    else if (d.pavilion_depth < 45.0) pavilion_depth_index = 4
+    else if (d.pavilion_depth < 46.5) pavilion_depth_index = 5
+    else pavilion_depth_index = 6
+
+    var girdle_index;
+    if (d.girdle < 0.5) girdle_index = 0
+    else if (d.girdle < 1.5) girdle_index = 1
+    else if (d.girdle < 2.0) girdle_index = 2
+    else if (d.girdle < 4.5) girdle_index = 3
+    else if (d.girdle < 5.5) girdle_index = 4
+    else if (d.girdle < 7.5) girdle_index = 5
+    else girdle_index = 6
+
+    var total_depth_index;
+    if (d.total_depth < 52.9) total_depth_index = 0
+    else if (d.total_depth < 55.4) total_depth_index = 1
+    else if (d.total_depth < 58.4) total_depth_index = 2
+    else if (d.total_depth < 63.5) total_depth_index = 3
+    else if (d.total_depth < 64.4) total_depth_index = 4
+    else if (d.total_depth < 66.9) total_depth_index = 5
+    else total_depth_index = 6
+
+    var sumalphabet_index;
+    if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 67.9) sumalphabet_index = 0
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 69.9) sumalphabet_index = 1
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 72.4) sumalphabet_index = 2
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 77.7) sumalphabet_index = 3
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 79.4) sumalphabet_index = 4
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 80.4) sumalphabet_index = 5
+    else sumalphabet_index = 6
+
+    var sumalphabet_index;
+    if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 67.9) sumalphabet_index = 0
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 69.9) sumalphabet_index = 1
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 72.4) sumalphabet_index = 2
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 77.7) sumalphabet_index = 3
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 79.4) sumalphabet_index = 4
+    else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 80.4) sumalphabet_index = 5
+    else sumalphabet_index = 6
+
+    return {
+        crown_angle_index: crown_angle_index,
+        pavilin_angle_index: pavilin_angle_index,
+        table_width_index: table_width_index,
+        crown_height_index: crown_height_index,
+        pavilion_depth_index: pavilion_depth_index,
+        girdle_index: girdle_index,
+        total_depth_index: total_depth_index,
+        sumalphabet_index: sumalphabet_index,
+    }
+}
+
+function getEvaluationHtml(){
+    var d = getParameters()
+    var index_lst = getEvaluationIndex()
+    
+    var crown_angle_html = getOverviewHtml(index_lst.crown_angle_index);
+    var pavilin_angle_html = getOverviewHtml(index_lst.pavilin_angle_index);
+    var table_width_html = getOverviewHtml(index_lst.table_width_index);
+    var crown_height_html = getOverviewHtml(index_lst.crown_height_index);
+    var pavilion_depth_html = getOverviewHtml(index_lst.pavilion_depth_index);
+    var girdle_html = getOverviewHtml(index_lst.girdle_index);
+    var total_depth_html = getOverviewHtml(index_lst.total_depth_index);
+    var sumalphabet_html = getOverviewHtml(index_lst.sumalphabet_index);
+    return {
+        crown_angle_html: crown_angle_html,
+        pavilin_angle_html: pavilin_angle_html,
+        table_width_html: table_width_html,
+        crown_height_html: crown_height_html,
+        pavilion_depth_html: pavilion_depth_html,
+        girdle_html: girdle_html,
+        total_depth_html: total_depth_html,
+        sumalphabet_html: sumalphabet_html,
+    }
+}
+
 $(document).ready(() => {
 
     panel = document.getElementById("panel").getContext("2d")
@@ -445,109 +593,39 @@ $(document).ready(() => {
     $("#overview").on("click", () => {
         d = getParameters()
 
-        var crown_angle_html;
-        if ((d.crown_angle_r + d.crown_angle_l)/2 < 25.9) crown_angle_html = getOverviewHtml(0)
-        else if ((d.crown_angle_r + d.crown_angle_l)/2 < 27.9) crown_angle_html = getOverviewHtml(1)
-        else if ((d.crown_angle_r + d.crown_angle_l)/2 < 31.2) crown_angle_html = getOverviewHtml(2)
-        else if ((d.crown_angle_r + d.crown_angle_l)/2 < 36.7) crown_angle_html = getOverviewHtml(3)
-        else if ((d.crown_angle_r + d.crown_angle_l)/2 < 38.2) crown_angle_html = getOverviewHtml(4)
-        else if ((d.crown_angle_r + d.crown_angle_l)/2 < 40.0) crown_angle_html = getOverviewHtml(5)
-        else crown_angle_html = getOverviewHtml(6)
-
-        var pavilin_angle_html;
-        if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 38.4) pavilin_angle_html = getOverviewHtml(0)
-        else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 39.5) pavilin_angle_html = getOverviewHtml(1)
-        else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 40.5) pavilin_angle_html = getOverviewHtml(2)
-        else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 41.8) pavilin_angle_html = getOverviewHtml(3)
-        else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 42.1) pavilin_angle_html = getOverviewHtml(4)
-        else if ((d.pavilion_angle_r + d.pavilion_angle_l)/2 < 43.1) pavilin_angle_html = getOverviewHtml(5)
-        else pavilin_angle_html = getOverviewHtml(6)
-
-        var table_width_html;
-        if (d.table_width < 47) table_width_html = getOverviewHtml(0)
-        else if (d.table_width < 49) table_width_html = getOverviewHtml(1)
-        else if (d.table_width < 51) table_width_html = getOverviewHtml(2)
-        else if (d.table_width < 62) table_width_html = getOverviewHtml(3)
-        else if (d.table_width < 66) table_width_html = getOverviewHtml(4)
-        else if (d.table_width < 70) table_width_html = getOverviewHtml(5)
-        else table_width_html = getOverviewHtml(6)
-
-        var crown_height_html;
-        if (d.crown_height < 8.5) crown_height_html = getOverviewHtml(0)
-        else if (d.crown_height < 10.5) crown_height_html = getOverviewHtml(1)
-        else if (d.crown_height < 11.5) crown_height_html = getOverviewHtml(2)
-        else if (d.crown_height < 17.0) crown_height_html = getOverviewHtml(3)
-        else if (d.crown_height < 18.0) crown_height_html = getOverviewHtml(4)
-        else if (d.crown_height < 19.5) crown_height_html = getOverviewHtml(5)
-        else crown_height_html = getOverviewHtml(6)
-
-        var pavilion_depth_html;
-        if (d.pavilion_depth < 39.5) pavilion_depth_html = getOverviewHtml(0)
-        else if (d.pavilion_depth < 41.0) pavilion_depth_html = getOverviewHtml(1)
-        else if (d.pavilion_depth < 42.5) pavilion_depth_html = getOverviewHtml(2)
-        else if (d.pavilion_depth < 44.5) pavilion_depth_html = getOverviewHtml(3)
-        else if (d.pavilion_depth < 45.0) pavilion_depth_html = getOverviewHtml(4)
-        else if (d.pavilion_depth < 46.5) pavilion_depth_html = getOverviewHtml(5)
-        else pavilion_depth_html = getOverviewHtml(6)
-
-        var girdle_html;
-        if (d.girdle < 0.5) girdle_html = getOverviewHtml(0)
-        else if (d.girdle < 1.5) girdle_html = getOverviewHtml(1)
-        else if (d.girdle < 2.0) girdle_html = getOverviewHtml(2)
-        else if (d.girdle < 4.5) girdle_html = getOverviewHtml(3)
-        else if (d.girdle < 5.5) girdle_html = getOverviewHtml(4)
-        else if (d.girdle < 7.5) girdle_html = getOverviewHtml(5)
-        else girdle_html = getOverviewHtml(6)
-
-        var total_depth_html;
-        if (d.total_depth < 52.9) total_depth_html = getOverviewHtml(0)
-        else if (d.total_depth < 55.4) total_depth_html = getOverviewHtml(1)
-        else if (d.total_depth < 58.4) total_depth_html = getOverviewHtml(2)
-        else if (d.total_depth < 63.5) total_depth_html = getOverviewHtml(3)
-        else if (d.total_depth < 64.4) total_depth_html = getOverviewHtml(4)
-        else if (d.total_depth < 66.9) total_depth_html = getOverviewHtml(5)
-        else total_depth_html = getOverviewHtml(6)
-
-        var sumalphabet_html;
-        if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 67.9) sumalphabet_html = getOverviewHtml(0)
-        else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 69.9) sumalphabet_html = getOverviewHtml(1)
-        else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 72.4) sumalphabet_html = getOverviewHtml(2)
-        else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 77.7) sumalphabet_html = getOverviewHtml(3)
-        else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 79.4) sumalphabet_html = getOverviewHtml(4)
-        else if ((d.crown_angle_r + d.crown_angle_l)/2 + (d.pavilion_angle_r + d.pavilion_angle_l)/2 < 80.4) sumalphabet_html = getOverviewHtml(5)
-        else sumalphabet_html = getOverviewHtml(6)
+        var htmlContent = getEvaluationHtml()
 
         var html = `<tr>
                         <th scope="row">Crown Angle (\u03B2)</th>
-                        ${crown_angle_html}
+                        ${htmlContent.crown_angle_html}
                     </tr>
                     <tr>
                         <th scope="row">Pavilion Angle (\u2C6D)</th>
-                        ${pavilin_angle_html}
+                        ${htmlContent.pavilin_angle_html}
                     </tr>
                     <tr class="table-group-divider">
                         <th scope="row">Table Width</th>
-                        ${table_width_html}
+                        ${htmlContent.table_width_html}
                     </tr>
                     <tr>
                         <th scope="row">Crown Height</th>
-                        ${crown_height_html}
+                        ${htmlContent.crown_height_html}
                     </tr>
                     <tr>
                         <th scope="row">Pavilion Depth</th>
-                        ${pavilion_depth_html}
+                        ${htmlContent.pavilion_depth_html}
                     </tr>
                     <tr>
                         <th scope="row">Girdle</th>
-                        ${girdle_html}
+                        ${htmlContent.girdle_html}
                     </tr>
                     <tr>
                         <th scope="row">Total Depth</th>
-                        ${total_depth_html}
+                        ${htmlContent.total_depth_html}
                     </tr>
                     <tr class="table-group-divider">
                         <th scope="row">Sum \u2C6D and \u03B2</th>
-                        ${sumalphabet_html}
+                        ${htmlContent.sumalphabet_html}
                     </tr>`
 
         $("#tbl_overview").empty(), $("#tbl_overview").append(html)
