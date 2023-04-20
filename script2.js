@@ -152,6 +152,7 @@ function calculate() {
     var diamond_volume = volume_top + volume_girdle + volume_bottom
 
     var diamond_weight = diamond_volume * pc.density
+    var diamond_weight_carat = diamond_weight / 0.2
 
 
     var evalIndexed = getEvaluationIndex()
@@ -225,8 +226,8 @@ function calculate() {
                 <td>${diamond_volume.toFixed(2)}</td>
             </tr>`
     html += `<tr>
-                <th scope="row">Diamond Weight(g)</th>
-                <td>${diamond_weight.toFixed(2)}</td>
+                <th scope="row">Diamond Weight(ct)</th>
+                <td>${diamond_weight_carat.toFixed(2)}</td>
             </tr>`
 
     $("#bend_rate").empty(), $("#bend_rate").append(html)
@@ -690,9 +691,11 @@ $(document).ready(() => {
         var diamond_volume = volume_top + volume_girdle + volume_bottom
 
         var diamond_weight = diamond_volume * pc.density
+        var diamond_weight_carat = diamond_weight / 0.2
 
         $("#diamond_volume").empty() , $("#diamond_volume").append(diamond_volume.toFixed(2))
         $("#diamond_weight").empty() , $("#diamond_weight").append(diamond_weight.toFixed(2))
+        $("#diamond_weight_carat").empty() , $("#diamond_weight_carat").append(diamond_weight_carat.toFixed(2))
 
     })
 
