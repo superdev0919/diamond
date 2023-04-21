@@ -117,10 +117,10 @@ function getParameters(){
     var crown_height = distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) / total_width * 100
     var pavilion_depth = distToSegment(points[4], points[3], points[5]) / total_width * 100
     var girdle = (distToSegment(points[4], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[2], points[lines[0].p1] , points[lines[0].p2]) - distToSegment(points[4], points[3], points[5])) / total_width * 100
-    var crown_angle_r = getAngle(points[1] , points[2] , points[3]) - 90
-    var crown_angle_l = getAngle(points[5] , points[6] , points[0]) - 90
-    var pavilion_angle_r = getAngle(points[2] , points[3] , points[4]) - 90
-    var pavilion_angle_l = getAngle(points[4] , points[5] , points[6]) - 90
+    var crown_angle_r = getAngle(points[1] , points[2] , points[6])
+    var crown_angle_l = getAngle(points[2] , points[6] , points[0])
+    var pavilion_angle_r = getAngle(points[5] , points[3] , points[4])
+    var pavilion_angle_l = getAngle(points[4] , points[5] , points[3])
     return {
         total_width: total_width,
         total_width_in_mm: total_width_in_mm,
